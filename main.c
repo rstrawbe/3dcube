@@ -218,6 +218,35 @@ static void step_forward(t_hero *h)
     h->pos_y += h->vector_y;
 }
 
+static int ch_map(int x, int y)
+{
+
+    char s;
+
+    if ((x == map.width || x == -1) || (y == map.height || y == -1))
+        return (0);
+    s = map.field[y][x] == '0' ? ' ' : 0;
+    s = !s && map.field[y][x] == 'N' ? ' ' : s;
+    s = !s && map.field[y][x] == 'S' ? ' ' : s;
+    s = !s && map.field[y][x] == 'W' ? ' ' : s;
+    s = !s && map.field[y][x] == 'E' ? ' ' : s;
+    if (s) {
+        map.field[y][x] = s;
+        if (!ch_map(x, y - 1))
+            return (0);
+        if (!ch_map(x - 1, y ))
+            return (0);
+        if (!ch_map(x, y + 1))
+            return (0);
+        if (!ch_map(x + 1, y))
+            return (0);
+    }
+    system("clear");
+    map_print(map.field);
+    //usleep(25000);
+    return (1);
+}
+
 
 static int create_map(const char *filename)
 {
@@ -351,6 +380,13 @@ static int create_map(const char *filename)
     copy_hero.pos_y = hero.pos_y_start;
 
     copy_hero.direction = hero.direction;
+
+    i = 0;
+    i = ch_map(hero.pos_x_start, hero.pos_y_start);
+
+    printf("\nMap Valid: %d\n", i);
+
+    exit(0);
 
     check_process = 1;
 
