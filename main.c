@@ -38,153 +38,21 @@ static  void map_print(char **arr)
     }
 }
 
-static  char **map_copy()
-{
-    int i;
-    int j;
-    char **copy_map;
-
-    i = 0;
-    j = 0;
-
-    if (!(copy_map = (char **)malloc(sizeof(char **) * map.height + 1)))
-        return (NULL);
-
-    while (i < map.height) {
-        if (!(copy_map[i++] = (char *) malloc(sizeof(char) * map.width + 1)))
-        {
-            while (--i >= 0)
-                free(copy_map[i]);
-            free(copy_map);
-            return (NULL);
-        }
-    }
-    *copy_map[i - 1] = '\0';
-
-    i = 0;
-    j = 0;
-
-    while (copy_map[i])
-        copy_map[i++][map.width] = '\0';
-    i = 0;
-    while (i < map.height)
-    {
-        while (j < map.width)
-        {
-            copy_map[i][j] = map.field[i][j];
-            j++;
-        }
-        i++;
-        j = 0;
-    }
-    return (copy_map);
-}
-
 static void append_map_line(char *line, int i)
 {
     int j;
     char s;
 
-    j = 0;
-    while (line[j])
-    {
-        s = (line[j] == ' ') ? '1' : line[j];
-        map.field[i][j++] = s;
+    if (line && *line) {
+        j = 0;
+        while (line[j]) {
+            s = (line[j] == ' ') ? '1' : line[j];
+            map.field[i][j++] = s;
 
+        }
+        while (j < map.width)
+            map.field[i][j++] = '1';
     }
-    while (j < map.width)
-        map.field[i][j++] = '1';
-}
-
-static void turn_right(t_hero *h)
-{
-    if (h->direction == 'N')
-    {
-        h->vector_x = 1;
-        h->vector_y = 0;
-        h->direction = 'E';
-    } else if (h->direction == 'W')
-    {
-        h->vector_x = 0;
-        h->vector_y = -1;
-        h->direction = 'N';
-    } else if (h->direction == 'S')
-    {
-        h->vector_x = -1;
-        h->vector_y = 0;
-        h->direction = 'W';
-    } else if (h->direction == 'E')
-    {
-        h->vector_x = 0;
-        h->vector_y = 1;
-        h->direction = 'S';
-    }
-
-}
-
-static void turn_left(t_hero *h)
-{
-    if (h->direction == 'N')
-    {
-        h->vector_x = -1;
-        h->vector_y = 0;
-        h->direction = 'W';
-    } else if (h->direction == 'W')
-    {
-        h->vector_x = 0;
-        h->vector_y = 1;
-        h->direction = 'S';
-    } else if (h->direction == 'S')
-    {
-        h->vector_x = 1;
-        h->vector_y = 0;
-        h->direction = 'E';
-    } else if (h->direction == 'E')
-    {
-        h->vector_x = 0;
-        h->vector_y = -1;
-        h->direction = 'N';
-    }
-
-}
-
-static char next_val(t_hero *h, char **arr)
-{
-    if (h->direction == 'N')
-    {
-        if (h->pos_y - 1 < 0)
-            return ('e');
-        return (arr[h->pos_y - 1][h->pos_x]);
-    } else if (h->direction == 'W')
-    {
-        if (h->pos_x - 1 < 0)
-            return ('e');
-        return (arr[h->pos_y][h->pos_x - 1]);
-    } else if (h->direction == 'S')
-    {
-        if (h->pos_y + 1 >= map.height)
-            return ('e');
-        return (arr[h->pos_y + 1][h->pos_x]);
-    } else if (h->direction == 'E')
-    {
-        if (h->pos_x + 1 >= map.width)
-            return ('e');
-        return (arr[h->pos_y][h->pos_x + 1]);
-    }
-    return ('e');
-}
-
-static char right_val(t_hero *h, char **arr)
-{
-    if (h->direction == 'N')
-        return (arr[h->pos_y][h->pos_x + 1]);
-    else if (h->direction == 'W')
-        return (arr[h->pos_y - 1][h->pos_x]);
-    else if (h->direction == 'S')
-        return (arr[h->pos_y][h->pos_x - 1]);
-    else if (h->direction == 'E')
-        return (arr[h->pos_y + 1][h->pos_x]);
-    return ('e');
 }
 
 static void set_direction(t_hero *h, char c)
@@ -212,24 +80,20 @@ static void set_direction(t_hero *h, char c)
     h->direction = c;
 }
 
-static void step_forward(t_hero *h)
-{
-    h->pos_x += h->vector_x;
-    h->pos_y += h->vector_y;
-}
-
 static int ch_map(int x, int y)
 {
 
     char s;
-
+    system("clear");
+    map_print(map.field);
+    usleep(2500);
     if ((x == map.width || x == -1) || (y == map.height || y == -1))
         return (0);
     s = map.field[y][x] == '0' ? ' ' : 0;
-    s = !s && map.field[y][x] == 'N' ? ' ' : s;
-    s = !s && map.field[y][x] == 'S' ? ' ' : s;
-    s = !s && map.field[y][x] == 'W' ? ' ' : s;
-    s = !s && map.field[y][x] == 'E' ? ' ' : s;
+    s = !s && map.field[y][x] == 'N' ? 'N' : s;
+    s = !s && map.field[y][x] == 'S' ? 'S' : s;
+    s = !s && map.field[y][x] == 'W' ? 'W' : s;
+    s = !s && map.field[y][x] == 'E' ? 'E' : s;
     if (s) {
         map.field[y][x] = s;
         if (!ch_map(x, y - 1))
@@ -241,259 +105,139 @@ static int ch_map(int x, int y)
         if (!ch_map(x + 1, y))
             return (0);
     }
-    system("clear");
-    map_print(map.field);
-    //usleep(25000);
     return (1);
+}
+
+int set_texture_path(char *line)
+{
+
+    if (line && line[0] && line[1])
+        return (1);
+    return (0);
 }
 
 
 static int create_map(const char *filename)
 {
-    int i;
-    int j;
+    int     i;
     int     fd;
     char	*line;
     int     str_len;
-    char    **copy_map;
-    t_hero  copy_hero;
-    int     check_process;
-
-    line = NULL;
+    char    **data;
 
     map.width = 0;
     map.height = 0;
 
-    i = 0;
-    j = 0;
-
     if ((fd = open(filename, O_RDONLY)) == -1)
         return (0);
-    while(get_next_line(fd, &line) >= 0 && (str_len = ft_strlen(line)) && ++map.height)
+
+    i = 0;
+    line = NULL;
+    data = NULL;
+    //map.textures_ready = 1;
+    while(get_next_line(fd, &line) > 0)
     {
-        if (!(is_line_of_allowed_char(line))) {
-            printf("no valid!\n");
-            return (0);
-        }
-
-        i = 0;
-        while (line[i])
+        str_len = ft_strlen(line);
+        if (str_len && !map.textures_ready)
         {
-            if (line[i] == 'N')
-            {
-                if (hero.pos_x_start)
-                    return (0);
-                hero.pos_x_start = i;
-                hero.pos_y_start = map.height - 1;
-                set_direction(&hero, line[i]);
+            if (line[0] == 'R') {
+                data = ft_split(line, ' ');
+                printf("%s \n", data[1]);
+                map.window_width = ft_atoi(&data[1][0]);
+                map.window_height = ft_atoi(&data[2][0]);
+                printf("window_width %d \n", map.window_width);
+                printf("window_height %d \n", map.window_height);
+
+                break;
             }
-
-            if (line[i] == 'W')
-            {
-                if (hero.pos_x_start)
-                    return (0);
-
-                hero.pos_x_start = i;
-                hero.pos_y_start = map.height - 1;
-                set_direction(&hero, line[i]);
-            }
-
-            if (line[i] == 'S')
-            {
-                if (hero.pos_x_start)
-                    return (0);
-
-                hero.pos_x_start = i;
-                hero.pos_y_start = map.height - 1;
-                set_direction(&hero, line[i]);
-            }
-
-            if (line[i] == 'E')
-            {
-                if (hero.pos_x_start)
-                    return (0);
-
-                hero.pos_x_start = i;
-                hero.pos_y_start = map.height - 1;
-                set_direction(&hero, line[i]);
-            }
-            i++;
+            set_texture_path(line);
         }
 
-        map.width = str_len > map.width ? str_len : map.width;
+        if (str_len && map.textures_ready && ++map.height) {
+            if (!(is_line_of_allowed_char(line))) {
+                printf("no valid!\n");
+                return (0);
+            }
+
+            i = 0;
+            while (line[i]) {
+                if (ft_strchr(&ALLOWED_DIRECTIONS[0], line[i])) {
+                    if (hero.direction)
+                        return (0);
+                    hero.pos_x_start = i;
+                    hero.pos_y_start = map.height - 1;
+                    set_direction(&hero, line[i]);
+                }
+                i++;
+            }
+            map.width = str_len > map.width ? str_len : map.width;
+            if (map.width > 100 || map.height > 100) {
+                printf("Error\nLong map");
+                return (0);
+            }
+        }
         free(line);
     }
+    free(line);
+    close(fd);
+
+    printf("map.win_width: %d \n", map.window_width);
+    printf("map.height: %d\n", map.height);
+    printf("map.width: %d\n", map.width);
+
+    exit(0);
 
     if (map.height <= 2) {
         printf("lines is <= 2");
         return (0);
     }
-    free(line);
-
-    close(fd);
-    if ((fd = open(filename, O_RDONLY)) == -1)
+    if (!hero.direction)
         return (0);
 
-    map.field = (char **)malloc(sizeof(char **) * map.height + 1);
+    i = 0;
+    if (!(map.field = (char **)malloc(sizeof(char **) * map.height)))
+        return (0);
+    while (i < map.height) {
+        if (!(map.field[i++] = (char *)malloc(sizeof(char) * map.width + 1)))
+        {
+            while (--i >= 0)
+                free(map.field[i]);
+            free(map.field);
+
+            printf("\nError allocate:\n");
+            exit(0);
+        }
+    }
+
+    map.field[i] = NULL;
 
     i = 0;
-    j = 0;
-
-    while (i < map.height)
-        map.field[i++] = (char *)malloc(sizeof(char) * map.width + 1);
-
-    *map.field[i - 1] = '\0';
-
-    i = 0;
-    j = 0;
-
     while (map.field[i])
         map.field[i++][map.width] = '\0';
 
+
     i = 0;
-    j = 0;
-    while (get_next_line(fd, &line) >= 1)
-    {
-        append_map_line(line, i++);
-        free(line);
-    }
-    append_map_line(line, i++);
-    free(line);
-
-
-//    printf("pos_x_start: %d\n", hero.pos_x_start);
-//    printf("pos_y_start: %d\n", hero.pos_y_start);
-//    printf("vector_x: %d\n", hero.vector_x);
-//    printf("vector_y: %d\n\n\n", hero.vector_y);
-
-    if (!(copy_map = map_copy()))
+    if ((fd = open(filename, O_RDONLY)) == -1)
         return (0);
 
-
-    copy_hero.vector_x = hero.vector_x;
-    copy_hero.vector_y = hero.vector_y;
-
-    copy_hero.pos_x_start = hero.pos_x_start;
-    copy_hero.pos_y_start = hero.pos_y_start;
-
-    copy_hero.pos_x = hero.pos_x_start;
-    copy_hero.pos_y = hero.pos_y_start;
-
-    copy_hero.direction = hero.direction;
-
-    i = 0;
-    i = ch_map(hero.pos_x_start, hero.pos_y_start);
-
-    printf("\nMap Valid: %d\n", i);
-
-    exit(0);
-
-    check_process = 1;
-
-    char s;
-    int cnt = 0;
-    while (cnt < 4)
+    while (get_next_line(fd, &line) > 0)
     {
-        copy_hero.pos_y = hero.pos_y_start;
-        copy_hero.pos_x = hero.pos_x_start;
-        set_direction(&copy_hero, ALLOWED_DIRECTIONS[cnt++]);
+        if ((str_len = ft_strlen(line)))
+            append_map_line(line, i++);
+        free(line);
+    }
+    free(line);
 
-        while (next_val(&copy_hero, copy_map) == '0'
-        || next_val(&copy_hero, copy_map) == ' ') {
-            step_forward(&copy_hero);
-        }
-        copy_hero.pos_y_start = copy_hero.pos_y;
-        copy_hero.pos_x_start = copy_hero.pos_x;
-        turn_left(&copy_hero);
-
-        while (next_val(&copy_hero, copy_map) != 'e') {
-
-            s = ' ';
-            copy_map[copy_hero.pos_y][copy_hero.pos_x] = s;
-
-            system("clear");
-            map_print(copy_map);
-
-            printf("\n\npos_x_start: %d\n", copy_hero.pos_x_start);
-            printf("pos_y_start: %d\n", copy_hero.pos_y_start);
-
-            printf("pos_x: %d\n", copy_hero.pos_x);
-            printf("pos_y: %d\n", copy_hero.pos_y);
-            printf("direction: %c\n", copy_hero.direction);
-            printf("vector_x: %d\n", copy_hero.vector_x);
-            printf("vector_y: %d\n", copy_hero.vector_y);
-
-            printf("nval: %c\n", next_val(&copy_hero, copy_map));
-            printf("rval: %c\n", right_val(&copy_hero, copy_map));
-
-            usleep(100000);
-
-            if (next_val(&copy_hero, copy_map) == '1'
-            && right_val(&copy_hero, copy_map) != '0'
-            && right_val(&copy_hero, copy_map) != ' ') {
-                turn_left(&copy_hero);
-            } else if ((right_val(&copy_hero, copy_map) == '0'
-                || right_val(&copy_hero, copy_map) == ' ')
-                ) {
-                turn_right(&copy_hero);
-            }
-
-            if (next_val(&copy_hero, copy_map) != '1') {
-                step_forward(&copy_hero);
-
-                if (((copy_hero.pos_y_start == copy_hero.pos_y)
-                    && (copy_hero.pos_x_start == copy_hero.pos_x)))
-                    break;
-            }
-
-        }
-
-        system("clear");
-        map_print(copy_map);
-
-        printf("\n\npos_x: %d\n", copy_hero.pos_x);
-        printf("pos_y: %d\n", copy_hero.pos_y);
-        printf("direction: %c\n", copy_hero.direction);
-        printf("vector_x: %d\n", copy_hero.vector_x);
-        printf("vector_y: %d\n", copy_hero.vector_y);
-
-        if (next_val(&copy_hero, copy_map) == 'e')
-        {
-            printf("Error\n Map is not Valid\n");
-            check_process = 0;
-            break;
-        }
-
-        if ((copy_hero.pos_y_start == copy_hero.pos_y)
-            && (copy_hero.pos_x_start == copy_hero.pos_x) && cnt == 3)
-        {
-            printf("Map is Valid\n");
-            check_process = 0;
-            //break;
-        }
+    if (!(ch_map(hero.pos_x_start, hero.pos_y_start))) {
+        printf("\nMap not Valid\n");
+        exit(0);
     }
 
+    printf("++\n");
+    printf("map.height: %d\n", map.height);
 
-    exit(0);
-
-    turn_right(&copy_hero);
-
-    exit(0);
-
-//    Справа стена {
-//      i = 0
-//        Пока Впереди стена {
-//            if (++i == 4)
-//              {return valid}
-//            Поворот налево
-//        }
-//        Шаг Вперед
-//    } else {
-//        Поворот направо
-//        Шаг вперед
-//
-//    }
-
+    printf("map.height: %d\n", map.height);
+    printf("map.width: %d\n", map.width);
 
     return (1);
 

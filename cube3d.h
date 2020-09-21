@@ -26,6 +26,9 @@ typedef struct  s_map
     char        *sprite_path;
     int         floor_color;
     int         cell_color;
+    int         textures_ready;
+    int         window_width;
+    int         window_height;
     int         width;
     int         height;
     char        vector_start;
