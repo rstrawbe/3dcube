@@ -116,6 +116,26 @@ int set_texture_path(char *line)
     return (0);
 }
 
+static int ft_array_count(char **arr)
+{
+    int i;
+
+    i = 0;
+    while (arr && *arr++)
+        i++;
+    return (i);
+}
+
+static void ft_array_clean(char **arr)
+{
+    int i;
+
+    i = 0;
+    while (arr[i])
+        free(arr[i++]);
+    free(arr);
+}
+
 
 static int create_map(const char *filename)
 {
@@ -132,21 +152,28 @@ static int create_map(const char *filename)
         return (0);
 
     i = 0;
+
+    int arrcnt = 0;
     line = NULL;
     data = NULL;
-    map.textures_ready = 1;
+    //map.textures_ready = 1;
     while(get_next_line(fd, &line) > 0)
     {
         str_len = ft_strlen(line);
         if (str_len && !map.textures_ready)
         {
+
             if (line[0] == 'R') {
                 data = ft_split(line, ' ');
+
+                arrcnt = ft_array_count(data);
                 printf("%s \n", data[1]);
                 map.window_width = ft_atoi(&data[1][0]);
                 map.window_height = ft_atoi(&data[2][0]);
                 printf("window_width %d \n", map.window_width);
                 printf("window_height %d \n", map.window_height);
+
+                //ft_array_clean(data);
 
                 break;
             }
@@ -181,11 +208,15 @@ static int create_map(const char *filename)
     free(line);
     close(fd);
 
+    printf("arrcnt: %d \n", arrcnt);
     printf("map.win_width: %d \n", map.window_width);
     printf("map.height: %d\n", map.height);
     printf("map.width: %d\n", map.width);
 
-    //exit(0);
+
+    exit(0);
+
+    ft_array_clean(data);
 
     if (map.height <= 2) {
         printf("lines is <= 2");
