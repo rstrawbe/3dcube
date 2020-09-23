@@ -134,7 +134,7 @@ static int create_map(const char *filename)
     i = 0;
     line = NULL;
     data = NULL;
-    //map.textures_ready = 1;
+    map.textures_ready = 1;
     while(get_next_line(fd, &line) > 0)
     {
         str_len = ft_strlen(line);
@@ -185,7 +185,7 @@ static int create_map(const char *filename)
     printf("map.height: %d\n", map.height);
     printf("map.width: %d\n", map.width);
 
-    exit(0);
+    //exit(0);
 
     if (map.height <= 2) {
         printf("lines is <= 2");
