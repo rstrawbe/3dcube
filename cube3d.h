@@ -3,6 +3,7 @@
 
 # define ALLOWED_MAP_CHARS " 012NSEW"
 # define ALLOWED_DIRECTIONS "NSEW"
+# define EXT_LENGTH 5
 
 
 typedef struct s_hero {

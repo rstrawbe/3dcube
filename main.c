@@ -126,17 +126,6 @@ static int ft_array_count(char **arr)
     return (i);
 }
 
-static void ft_array_clean(char **arr)
-{
-    int i;
-
-    i = 0;
-    while (arr[i])
-        free(arr[i++]);
-    free(arr);
-}
-
-
 static int create_map(const char *filename)
 {
     int     i;
@@ -156,7 +145,7 @@ static int create_map(const char *filename)
     int arrcnt = 0;
     line = NULL;
     data = NULL;
-    //map.textures_ready = 1;
+    map.textures_ready = 1;
     while(get_next_line(fd, &line) > 0)
     {
         str_len = ft_strlen(line);
@@ -214,10 +203,6 @@ static int create_map(const char *filename)
     printf("map.width: %d\n", map.width);
 
 
-    exit(0);
-
-    ft_array_clean(data);
-
     if (map.height <= 2) {
         printf("lines is <= 2");
         return (0);
@@ -271,10 +256,34 @@ static int create_map(const char *filename)
     printf("map.width: %d\n", map.width);
 
     return (1);
-
-
 }
 
+static int check_file_ext(char *path, char *ext)
+{
+    char **path_parts;
+    int parts_count;
+
+    if (!(path_parts = ft_split(path, '.')))
+    {
+        printf("Error\nError getting file extension");
+        return (0);
+    }
+    parts_count = ft_array_count(path_parts);
+    if (ft_strncmp(path_parts[parts_count - 1], ext, EXT_LENGTH))
+    {
+        printf("Error\nUse file with extension \".%s\" \n", ext);
+        exit(777);
+        return (0);
+    }
+
+    if (parts_count == 1)
+    {
+        printf("Error\nEmpty filename \n");
+        return (0);
+    }
+    return (1);
+
+}
 
 int             main(int argc, char **argv)
 {
@@ -286,9 +295,9 @@ int             main(int argc, char **argv)
         return (1);
     }
 
-
-    if (!create_map( argv[1])) {
+    if (!check_file_ext(argv[1], "cub")  || !create_map(argv[1])) {
         printf("Error create_map");
+        strerror(1)
     }
 
 //    printf("S isAllowed: %d\n", is_allowed_char('S'));
