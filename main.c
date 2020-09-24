@@ -297,7 +297,7 @@ int             main(int argc, char **argv)
 
     if (!check_file_ext(argv[1], "cub")  || !create_map(argv[1])) {
         printf("Error create_map");
-        strerror(1)
+        strerror(1);
     }
 
 //    printf("S isAllowed: %d\n", is_allowed_char('S'));
