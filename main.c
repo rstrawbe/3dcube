@@ -82,11 +82,12 @@ static void set_direction(t_hero *h, char c)
 
 static int ch_map(int x, int y)
 {
-
     char s;
+
     system("clear");
     map_print(map.field);
     usleep(2500);
+
     if ((x == map.width || x == -1) || (y == map.height || y == -1))
         return (0);
     s = map.field[y][x] == '0' ? ' ' : 0;
@@ -110,7 +111,6 @@ static int ch_map(int x, int y)
 
 int set_texture_path(char *line)
 {
-
     if (line && line[0] && line[1])
         return (1);
     return (0);
@@ -124,6 +124,14 @@ static int ft_array_count(char **arr)
     while (arr && *arr++)
         i++;
     return (i);
+}
+
+static int	config_is_init(void)
+{
+    return (map.window_height && map.window_width
+            && map.north_texture && map.south_texture
+            && map.west_texture && map.east_texture && map.sprite_path
+            && map.floor_color.is_init && map.cell_color.is_init);
 }
 
 static int create_map(const char *filename)
@@ -142,7 +150,6 @@ static int create_map(const char *filename)
 
     i = 0;
 
-    int arrcnt = 0;
     line = NULL;
     data = NULL;
     map.textures_ready = 1;
@@ -154,8 +161,6 @@ static int create_map(const char *filename)
 
             if (line[0] == 'R') {
                 data = ft_split(line, ' ');
-
-                arrcnt = ft_array_count(data);
                 printf("%s \n", data[1]);
                 map.window_width = ft_atoi(&data[1][0]);
                 map.window_height = ft_atoi(&data[2][0]);
@@ -197,7 +202,25 @@ static int create_map(const char *filename)
     free(line);
     close(fd);
 
-    printf("arrcnt: %d \n", arrcnt);
+    printf("config_is_init: %d\n", config_is_init());
+    map.window_width = 10;
+    map.window_height = 10;
+
+    map.north_texture = &ALLOWED_DIRECTIONS[0];
+    map.east_texture = &ALLOWED_DIRECTIONS[0];
+    map.south_texture = &ALLOWED_DIRECTIONS[0];
+    map.west_texture = &ALLOWED_DIRECTIONS[0];
+
+    map.sprite_path = &ALLOWED_DIRECTIONS[0];
+
+    map.floor_color.is_init = 1;
+    map.cell_color.is_init = 1;
+
+    printf("config_is_init: %d\n", config_is_init());
+
+    exit(0);
+
+
     printf("map.win_width: %d \n", map.window_width);
     printf("map.height: %d\n", map.height);
     printf("map.width: %d\n", map.width);
@@ -254,6 +277,9 @@ static int create_map(const char *filename)
 
     printf("map.height: %d\n", map.height);
     printf("map.width: %d\n", map.width);
+
+    printf("hero.pos_x_start: %d\n", hero.pos_x_start);
+    printf("hero.pos_y_start: %d\n", hero.pos_y_start);
 
     return (1);
 }

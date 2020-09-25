@@ -5,6 +5,12 @@
 # define ALLOWED_DIRECTIONS "NSEW"
 # define EXT_LENGTH 5
 
+typedef struct s_color {
+    int     is_init;
+    int     red;
+    int     green;
+    int     blue;
+}               t_color;
 
 typedef struct s_hero {
     int     pos_x_start;
@@ -25,8 +31,8 @@ typedef struct  s_map
     char        *west_texture;
     char        *east_texture;
     char        *sprite_path;
-    int         floor_color;
-    int         cell_color;
+//    int         floor_color;
+//    int         cell_color;
     int         textures_ready;
     int         window_width;
     int         window_height;
@@ -34,5 +40,8 @@ typedef struct  s_map
     int         height;
     char        vector_start;
     char        **field;
+
+    t_color floor_color;
+    t_color cell_color;
 }               t_map;
 #endif
