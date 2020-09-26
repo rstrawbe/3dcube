@@ -7,6 +7,16 @@
 # define ALLOWED_DIRECTIONS "NSEW"
 # define EXT_LENGTH 5
 
+# define STDERR 2
+# define MAX_MAP_WIDTH 100
+# define MAX_MAP_HEIGHT 100
+# define ERR_ARG "Invalid argument"
+# define ERR_MAP_EXT "Incorrect format: Use file with extension \".cub\""
+# define ERR_OPEN_FILE "Failed to open file"
+# define ERR_FORBIDDEN_SYMBOL_IN_MAP "Forbidden symbol found in the map"
+# define ERR_MULTIPLE_POSITION "Multiple player positions on the map"
+# define ERR_MAP_SIZE "The size of the map is too large"
+
 typedef struct s_color {
     int     is_init;
     int     red;
@@ -33,7 +43,6 @@ typedef struct  s_map
     char        *west_texture;
     char        *east_texture;
     char        *sprite_path;
-    int         textures_ready;
     int         window_width;
     int         window_height;
     int         width;
@@ -43,5 +52,7 @@ typedef struct  s_map
 
     t_color     floor_color;
     t_color     cell_color;
+
+    char        *error;
 }               t_map;
 #endif
