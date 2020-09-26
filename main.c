@@ -218,7 +218,7 @@ static int create_map(const char *filename)
 
     printf("config_is_init: %d\n", config_is_init());
 
-    exit(0);
+    return(0);
 
 
     printf("map.win_width: %d \n", map.window_width);
@@ -298,7 +298,8 @@ static int check_file_ext(char *path, char *ext)
     if (ft_strncmp(path_parts[parts_count - 1], ext, EXT_LENGTH))
     {
         printf("Error\nUse file with extension \".%s\" \n", ext);
-        exit(777);
+        perror ("Program Error Test");
+        return 0;
         return (0);
     }
 
@@ -317,8 +318,11 @@ int             main(int argc, char **argv)
 //    void    *mlx_win;
 
     if (argc < 2) {
-        perror("Error. You must add path/to/map.cub as second argument!");
-        return (1);
+        printf("%d\n", errno);
+        perror("Error\n");
+        perror(strerror(EIO));
+        printf("%d\n", EIO);
+        return (0);
     }
 
     if (!check_file_ext(argv[1], "cub")  || !create_map(argv[1])) {
