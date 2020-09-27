@@ -84,9 +84,9 @@ static int ch_map(int x, int y)
 {
     char s;
 
-    system("clear");
-    map_print(map.field);
-    usleep(2500);
+//    system("clear");
+//    map_print(map.field);
+//    usleep(2000);
 
     if ((x == map.width || x == -1) || (y == map.height || y == -1))
         return (0);
@@ -160,10 +160,122 @@ static int exit_with_error(char *str, int code)
 
 int parse_config_str(char *line)
 {
-    char *ln;
+    char **arr;
+    int arr_count;
 
-    ln=line;
-    return (1);
+    arr = ft_split(line, ' ');
+    arr_count = ft_array_count(arr);
+    if (arr_count < 2) {
+        printf("str: %s\n", arr[0]);
+        return (0);
+    }
+    if (!ft_strncmp("R", &arr[0][0], EXT_LENGTH) && arr_count == 3)
+    {
+        map.window_width = ft_atoi(&arr[1][0]);
+        map.window_height = ft_atoi(&arr[2][0]);
+        return (1);
+    }
+    if (!ft_strncmp("NO", &arr[0][0], EXT_LENGTH) && arr_count == 2)
+        if ((map.north_texture = ft_strdup(&arr[1][0])))
+            return (1);
+    if (!ft_strncmp("SO", &arr[0][0], EXT_LENGTH) && arr_count == 2)
+        if ((map.south_texture = ft_strdup(&arr[1][0])))
+            return (1);
+    if (!ft_strncmp("WE", &arr[0][0], EXT_LENGTH) && arr_count == 2)
+        if ((map.west_texture = ft_strdup(&arr[1][0])))
+            return (1);
+    if (!ft_strncmp("EA", &arr[0][0], EXT_LENGTH) && arr_count == 2)
+        if ((map.east_texture = ft_strdup(&arr[1][0])))
+            return (1);
+    if (!ft_strncmp("S", &arr[0][0], EXT_LENGTH) && arr_count == 2)
+        if ((map.sprite_path = ft_strdup(&arr[1][0])))
+            return (1);
+
+    if (!ft_strncmp("F", &arr[0][0], EXT_LENGTH) && arr_count == 2)
+        if ((map.floor_color.is_init = 1))
+            return (1);
+    if (!ft_strncmp("C", &arr[0][0], EXT_LENGTH) && arr_count == 2)
+        if ((map.cell_color.is_init = 1))
+            return (1);
+
+    return (0);
+}
+
+typedef struct  s_data {
+    void        *img;
+    char        *addr;
+    int         bits_per_pixel;
+    int         line_length;
+    int         endian;
+}               t_data;
+
+void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
+{
+    char    *dst;
+
+    dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+    *(unsigned int*)dst = color;
+}
+
+
+static void map_render(void)
+{
+    void    *mlx;
+    void    *mlx_win;
+
+    t_data  img;
+
+    mlx = mlx_init();
+    mlx_win = mlx_new_window(mlx, map.window_width, map.window_height, "старт!");
+
+    img.img = mlx_new_image(mlx, map.window_width, map.window_height);
+    img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
+
+    int i = 0;
+    int j = 0;
+
+    int x = 0;
+    int y = 0;
+
+    int c1 = 0x3ea135;
+    int c0 = 0xffffff;
+    int c3 = 0x630505;
+    int c_def = 0x000FBF21;
+
+    while (i < map.height)
+    {
+        j = 0;
+        while (j < map.width)
+        {
+            c_def = map.field[i][j] == '1' ? c1 : c_def;
+            c_def = map.field[i][j] == ' ' ? c0 : c_def;
+            c_def = map.field[i][j] == 'S' ? c3 : c_def;
+            c_def = map.field[i][j] == 'N' ? c3 : c_def;
+            c_def = map.field[i][j] == 'W' ? c3 : c_def;
+            c_def = map.field[i][j] == 'E' ? c3 : c_def;
+
+            y = 0;
+            while (y < 30 && (i * 30 + y < map.window_height)) {
+                x = 0;
+                while (x < 30 && (j * 30 + x < map.window_width)) {
+                    my_mlx_pixel_put(&img, j*30 + x, i*30 + y, c_def);
+                    x++;
+                }
+                y++;
+            }
+            j++;
+        }
+        i++;
+    }
+
+    //int offsetY = (hero.pos_y_start * 10) - (map.window_height / 2) + hero.pos_y_start * 5;
+    //int offsetX = (hero.pos_x_start * 10) - (map.window_width / 2) + hero.pos_x_start * 5;
+  //  int offsetX = (map.window_width - (hero.pos_x_start * 10));
+
+    mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
+
+
+    mlx_loop(mlx);
 }
 
 static int create_map(const char *filename)
@@ -183,32 +295,24 @@ static int create_map(const char *filename)
         return (exit_with_error(ERR_OPEN_FILE, 1));
 
     i = 0;
+    int strnum = 0;
     while(get_next_line(fd, &line) > 0)
     {
+        if (!config_is_init())
+            ++strnum;
         str_len = ft_strlen(line);
         if (str_len && !config_is_init())
         {
             if (!parse_config_str(line))
-                return (exit_with_error(null, 1));
-
-            if (line[0] == 'R') {
-                data = ft_split(line, ' ');
-                printf("%s \n", data[1]);
-                map.window_width = ft_atoi(&data[1][0]);
-                map.window_height = ft_atoi(&data[2][0]);
-
-                break;
-            }
-            set_texture_path(line);
-        } else if (str_len && ++map.height) {
-            if (!(is_line_of_allowed_char(line))) {
+                return (exit_with_error(ERR_PARSE_CONFIG_LINE, 1));
+        } else if (str_len && config_is_init() && ++map.height) {
+            if (!(is_line_of_allowed_char(line)))
                 return (exit_with_error(ERR_FORBIDDEN_SYMBOL_IN_MAP, 1));
-            }
             i = 0;
             while (line[i]) {
                 if (ft_strchr(&ALLOWED_DIRECTIONS[0], line[i])) {
                     if (hero.direction)
-                        return (exit_with_error(ERR_MULTIPLE_POSITION, 1));
+                        return (exit_with_error(ERR_HERO_POSITION, 1));
                     hero.pos_x_start = i;
                     hero.pos_y_start = map.height - 1;
                     set_direction(&hero, line[i]);
@@ -224,36 +328,11 @@ static int create_map(const char *filename)
     free(line);
     close(fd);
 
-    printf("config_is_init: %d\n", config_is_init());
-    map.window_width = 10;
-    map.window_height = 10;
-
-    map.north_texture = &ALLOWED_DIRECTIONS[0];
-    map.east_texture = &ALLOWED_DIRECTIONS[0];
-    map.south_texture = &ALLOWED_DIRECTIONS[0];
-    map.west_texture = &ALLOWED_DIRECTIONS[0];
-
-    map.sprite_path = &ALLOWED_DIRECTIONS[0];
-
-    map.floor_color.is_init = 1;
-    map.cell_color.is_init = 1;
-
-    printf("config_is_init: %d\n", config_is_init());
-
-    return(0);
-
-
-    printf("map.win_width: %d \n", map.window_width);
-    printf("map.height: %d\n", map.height);
-    printf("map.width: %d\n", map.width);
-
-
     if (map.height <= 2) {
-        printf("lines is <= 2");
-        return (0);
+        return (exit_with_error(ERR_MAP_SIZE, 1));
     }
     if (!hero.direction)
-        return (0);
+        return (exit_with_error(ERR_HERO_POSITION, 1));
 
     i = 0;
     if (!(map.field = (char **)malloc(sizeof(char **) * map.height)))
@@ -269,18 +348,17 @@ static int create_map(const char *filename)
             exit(0);
         }
     }
-
     map.field[i] = NULL;
 
     i = 0;
     while (map.field[i])
         map.field[i++][map.width] = '\0';
 
-
     i = 0;
     if ((fd = open(filename, O_RDONLY)) == -1)
         return (0);
-
+    while (get_next_line(fd, &line) > 0 && strnum--)
+        free(line);
     while (get_next_line(fd, &line) > 0)
     {
         if ((str_len = ft_strlen(line)))
@@ -289,21 +367,14 @@ static int create_map(const char *filename)
     }
     free(line);
 
-    if (!(ch_map(hero.pos_x_start, hero.pos_y_start))) {
-        printf("\nMap not Valid\n");
-        exit(0);
-    }
+    if (!(ch_map(hero.pos_x_start, hero.pos_y_start)))
+        return (exit_with_error("Map is not valid", 1));
 
-    printf("++\n");
-    printf("map.height: %d\n", map.height);
+    map_print(map.field);
 
-    printf("map.height: %d\n", map.height);
-    printf("map.width: %d\n", map.width);
+    map_render();
 
-    printf("hero.pos_x_start: %d\n", hero.pos_x_start);
-    printf("hero.pos_y_start: %d\n", hero.pos_y_start);
-
-    return (1);
+    return (0);
 }
 
 int             main(int argc, char **argv)

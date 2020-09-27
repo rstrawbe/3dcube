@@ -14,8 +14,9 @@
 # define ERR_MAP_EXT "Incorrect format: Use file with extension \".cub\""
 # define ERR_OPEN_FILE "Failed to open file"
 # define ERR_FORBIDDEN_SYMBOL_IN_MAP "Forbidden symbol found in the map"
-# define ERR_MULTIPLE_POSITION "Multiple player positions on the map"
-# define ERR_MAP_SIZE "The size of the map is too large"
+# define ERR_HERO_POSITION "Player position not defined"
+# define ERR_MAP_SIZE "Map size is wrong"
+# define ERR_PARSE_CONFIG_LINE "Incorrect config line"
 
 typedef struct s_color {
     int     is_init;
