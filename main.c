@@ -55,6 +55,75 @@ static void append_map_line(char *line, int i)
     }
 }
 
+static void step_forward(t_hero *h)
+{
+    int new_x;
+    int new_y;
+
+    new_x = h->pos_x + h->vector_x;
+    new_y = h->pos_y + h->vector_y;
+    if (map.field[new_y][new_x] == ' ') {
+        map.field[h->pos_y][h->pos_x] = ' ';
+        h->pos_x = new_x;
+        h->pos_y = new_y;
+        map.field[new_y][new_x] = hero.direction;
+    }
+}
+
+
+static void turn_right(t_hero *h)
+{
+    if (h->direction == 'N')
+    {
+        h->vector_x = 1;
+        h->vector_y = 0;
+        h->direction = 'E';
+    } else if (h->direction == 'W')
+    {
+        h->vector_x = 0;
+        h->vector_y = -1;
+        h->direction = 'N';
+    } else if (h->direction == 'S')
+    {
+        h->vector_x = -1;
+        h->vector_y = 0;
+        h->direction = 'W';
+    } else if (h->direction == 'E')
+    {
+        h->vector_x = 0;
+        h->vector_y = 1;
+        h->direction = 'S';
+    }
+
+}
+
+static void turn_left(t_hero *h)
+{
+    if (h->direction == 'N')
+    {
+        h->vector_x = -1;
+        h->vector_y = 0;
+        h->direction = 'W';
+    } else if (h->direction == 'W')
+    {
+        h->vector_x = 0;
+        h->vector_y = 1;
+        h->direction = 'S';
+    } else if (h->direction == 'S')
+    {
+        h->vector_x = 1;
+        h->vector_y = 0;
+        h->direction = 'E';
+    } else if (h->direction == 'E')
+    {
+        h->vector_x = 0;
+        h->vector_y = -1;
+        h->direction = 'N';
+    }
+
+}
+
+
 static void set_direction(t_hero *h, char c)
 {
     if (c == 'N')
@@ -83,10 +152,6 @@ static void set_direction(t_hero *h, char c)
 static int ch_map(int x, int y)
 {
     char s;
-
-//    system("clear");
-//    map_print(map.field);
-//    usleep(2000);
 
     if ((x == map.width || x == -1) || (y == map.height || y == -1))
         return (0);
@@ -209,6 +274,14 @@ typedef struct  s_data {
     int         endian;
 }               t_data;
 
+typedef struct  s_vars {
+    void        *mlx;
+    void        *win;
+
+    t_data      minimap;
+}               t_vars;
+
+
 void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
     char    *dst;
@@ -217,22 +290,8 @@ void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
     *(unsigned int*)dst = color;
 }
 
-
-static void map_render(void)
+void render_minimap(t_vars *vars)
 {
-    void    *mlx;
-    void    *mlx_win;
-
-    t_data  img;
-
-    mlx = mlx_init();
-    mlx_win = mlx_new_window(mlx, map.window_width, map.window_height, "старт!");
-
-    img.img = mlx_new_image(mlx, map.window_width, map.window_height);
-    img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
-
-    int i = 0;
-    int j = 0;
 
     int x = 0;
     int y = 0;
@@ -242,37 +301,100 @@ static void map_render(void)
     int c3 = 0x630505;
     int c_def = 0x000FBF21;
 
-    while (i < map.height)
+    int ofsX = -19;
+    int ofsY = -9;
+    int startX;
+    int startY;
+
+    int i = 0;
+    int j = 0;
+
+
+    while (ofsY < 10)
     {
         j = 0;
-        while (j < map.width)
+        ofsX = -19;
+        while (ofsX < 20)
         {
-            c_def = map.field[i][j] == '1' ? c1 : c_def;
-            c_def = map.field[i][j] == ' ' ? c0 : c_def;
-            c_def = map.field[i][j] == 'S' ? c3 : c_def;
-            c_def = map.field[i][j] == 'N' ? c3 : c_def;
-            c_def = map.field[i][j] == 'W' ? c3 : c_def;
-            c_def = map.field[i][j] == 'E' ? c3 : c_def;
+            startY = hero.pos_y + ofsY;
+            startX = hero.pos_x + ofsX;
+
+            if ((startY > map.height - 1)
+                || (startY < 0)
+                || (startX > map.width - 1)
+                || (startX < 0)) {
+                c_def = 0x858585;
+            } else {
+                c_def = map.field[startY][startX] == '1' ? c1 : c_def;
+                c_def = map.field[startY][startX] == ' ' ? c0 : c_def;
+                c_def = map.field[startY][startX] == 'S' ? c3 : c_def;
+                c_def = map.field[startY][startX] == 'N' ? c3 : c_def;
+                c_def = map.field[startY][startX] == 'W' ? c3 : c_def;
+                c_def = map.field[startY][startX] == 'E' ? c3 : c_def;
+            }
 
             y = 0;
-            while (y < 30 && (i * 30 + y < map.window_height)) {
+            while (y < 5) {
                 x = 0;
-                while (x < 30 && (j * 30 + x < map.window_width)) {
-                    my_mlx_pixel_put(&img, j*30 + x, i*30 + y, c_def);
+                while (x < 5) {
+                    my_mlx_pixel_put(&vars->minimap, j*5 + x, i*5 + y, c_def);
                     x++;
                 }
                 y++;
             }
             j++;
+            ofsX++;
         }
         i++;
+        ofsY++;
     }
 
-    //int offsetY = (hero.pos_y_start * 10) - (map.window_height / 2) + hero.pos_y_start * 5;
-    //int offsetX = (hero.pos_x_start * 10) - (map.window_width / 2) + hero.pos_x_start * 5;
-  //  int offsetX = (map.window_width - (hero.pos_x_start * 10));
+    if (vars) {}
 
-    mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
+    mlx_put_image_to_window(vars->mlx, vars->win, vars->minimap.img, 0, 0);
+}
+
+int             on_key_press_handler(int keycode, t_vars *vars)
+{
+    if (keycode == CODE_KEY_UP) {
+        step_forward(&hero);
+    }
+    if (keycode == CODE_KEY_RIGHT) {
+        turn_right(&hero);
+    }
+    if (keycode == CODE_KEY_LEFT) {
+        turn_left(&hero);
+    }
+    render_minimap(vars);
+    if (keycode == CODE_KEY_ESC) {
+        mlx_destroy_window(vars->mlx, vars->win);
+        exit(0);
+    }
+    return (0);
+}
+
+
+static void map_render(void)
+{
+    void    *mlx;
+    void    *mlx_win;
+
+    t_vars      vars;
+
+    mlx = mlx_init();
+    mlx_win = mlx_new_window(mlx, map.window_width, map.window_height, "старт!");
+
+    vars.mlx = mlx;
+    vars.win = mlx_win;
+
+    vars.minimap.img = mlx_new_image(mlx, 200, 100);
+    vars.minimap.addr = mlx_get_data_addr(vars.minimap.img,
+                                          &vars.minimap.bits_per_pixel,
+                                          &vars.minimap.line_length,
+                                          &vars.minimap.endian);
+
+    render_minimap(&vars);
+    mlx_key_hook(vars.win, on_key_press_handler, &vars);
 
 
     mlx_loop(mlx);
@@ -313,8 +435,8 @@ static int create_map(const char *filename)
                 if (ft_strchr(&ALLOWED_DIRECTIONS[0], line[i])) {
                     if (hero.direction)
                         return (exit_with_error(ERR_HERO_POSITION, 1));
-                    hero.pos_x_start = i;
-                    hero.pos_y_start = map.height - 1;
+                    hero.pos_x = i;
+                    hero.pos_y = map.height - 1;
                     set_direction(&hero, line[i]);
                 }
                 i++;
@@ -367,7 +489,7 @@ static int create_map(const char *filename)
     }
     free(line);
 
-    if (!(ch_map(hero.pos_x_start, hero.pos_y_start)))
+    if (!(ch_map(hero.pos_x, hero.pos_y)))
         return (exit_with_error("Map is not valid", 1));
 
     map_print(map.field);

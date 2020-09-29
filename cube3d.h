@@ -18,6 +18,12 @@
 # define ERR_MAP_SIZE "Map size is wrong"
 # define ERR_PARSE_CONFIG_LINE "Incorrect config line"
 
+# define CODE_KEY_ESC 53
+# define CODE_KEY_LEFT 123
+# define CODE_KEY_RIGHT 124
+# define CODE_KEY_DOWN 125
+# define CODE_KEY_UP 126
+
 typedef struct s_color {
     int     is_init;
     int     red;
