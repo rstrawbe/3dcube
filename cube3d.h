@@ -24,6 +24,8 @@
 # define CODE_KEY_DOWN 125
 # define CODE_KEY_UP 126
 
+# define SQUARE_SIZE 32
+
 typedef struct s_color {
     int     is_init;
     int     red;
@@ -41,6 +43,14 @@ typedef struct s_hero {
     char    direction;
     int     vector_x;
     int     vector_y;
+    float   planeY;
+    float   planeX;
+
+    float   dirX;
+    float   dirY;
+
+    int posX;
+    int posY;
 }               t_hero;
 
 typedef struct  s_map

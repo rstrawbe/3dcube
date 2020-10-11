@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include "minilibx/mlx.h"
 #include "cube3d.h"
@@ -55,73 +56,82 @@ static void append_map_line(char *line, int i)
     }
 }
 
-static void step_forward(t_hero *h)
-{
-    int new_x;
-    int new_y;
+//static void step_forward(t_hero *h)
+//{
+//    int new_x;
+//    int new_y;
+//
+//    new_x = (int)(h->pos_x / SQUARE_SIZE + h->vector_x);
+//    new_y = (int)(h->pos_y / SQUARE_SIZE + h->vector_y);
+//
+//
+//    if (map.field[new_y][new_x] == ' '
+//        || map.field[new_y][new_x] == hero.direction) {
+//
+//        map.field[(int)(h->pos_y / SQUARE_SIZE)][(int)(h->pos_x / SQUARE_SIZE)] = ' ';
+//
+//        h->pos_x += h->vector_x * 10;
+//        h->pos_y += h->vector_y * 10;
+//
+//        new_x = (int)(h->pos_x / SQUARE_SIZE);
+//        new_y = (int)(h->pos_y / SQUARE_SIZE);
+//
+//        map.field[new_y][new_x] = hero.direction;
+//    }
+//}
 
-    new_x = h->pos_x + h->vector_x;
-    new_y = h->pos_y + h->vector_y;
-    if (map.field[new_y][new_x] == ' ') {
-        map.field[h->pos_y][h->pos_x] = ' ';
-        h->pos_x = new_x;
-        h->pos_y = new_y;
-        map.field[new_y][new_x] = hero.direction;
-    }
-}
 
+//static void turn_right(t_hero *h)
+//{
+//    if (h->direction == 'N')
+//    {
+//        h->vector_x = 1;
+//        h->vector_y = 0;
+//        h->direction = 'E';
+//    } else if (h->direction == 'W')
+//    {
+//        h->vector_x = 0;
+//        h->vector_y = -1;
+//        h->direction = 'N';
+//    } else if (h->direction == 'S')
+//    {
+//        h->vector_x = -1;
+//        h->vector_y = 0;
+//        h->direction = 'W';
+//    } else if (h->direction == 'E')
+//    {
+//        h->vector_x = 0;
+//        h->vector_y = 1;
+//        h->direction = 'S';
+//    }
+//
+//}
 
-static void turn_right(t_hero *h)
-{
-    if (h->direction == 'N')
-    {
-        h->vector_x = 1;
-        h->vector_y = 0;
-        h->direction = 'E';
-    } else if (h->direction == 'W')
-    {
-        h->vector_x = 0;
-        h->vector_y = -1;
-        h->direction = 'N';
-    } else if (h->direction == 'S')
-    {
-        h->vector_x = -1;
-        h->vector_y = 0;
-        h->direction = 'W';
-    } else if (h->direction == 'E')
-    {
-        h->vector_x = 0;
-        h->vector_y = 1;
-        h->direction = 'S';
-    }
-
-}
-
-static void turn_left(t_hero *h)
-{
-    if (h->direction == 'N')
-    {
-        h->vector_x = -1;
-        h->vector_y = 0;
-        h->direction = 'W';
-    } else if (h->direction == 'W')
-    {
-        h->vector_x = 0;
-        h->vector_y = 1;
-        h->direction = 'S';
-    } else if (h->direction == 'S')
-    {
-        h->vector_x = 1;
-        h->vector_y = 0;
-        h->direction = 'E';
-    } else if (h->direction == 'E')
-    {
-        h->vector_x = 0;
-        h->vector_y = -1;
-        h->direction = 'N';
-    }
-
-}
+//static void turn_left(t_hero *h)
+//{
+//    if (h->direction == 'N')
+//    {
+//        h->vector_x = -1;
+//        h->vector_y = 0;
+//        h->direction = 'W';
+//    } else if (h->direction == 'W')
+//    {
+//        h->vector_x = 0;
+//        h->vector_y = 1;
+//        h->direction = 'S';
+//    } else if (h->direction == 'S')
+//    {
+//        h->vector_x = 1;
+//        h->vector_y = 0;
+//        h->direction = 'E';
+//    } else if (h->direction == 'E')
+//    {
+//        h->vector_x = 0;
+//        h->vector_y = -1;
+//        h->direction = 'N';
+//    }
+//
+//}
 
 
 static void set_direction(t_hero *h, char c)
@@ -279,6 +289,7 @@ typedef struct  s_vars {
     void        *win;
 
     t_data      minimap;
+    t_data      ray;
 }               t_vars;
 
 
@@ -288,6 +299,133 @@ void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 
     dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
     *(unsigned int*)dst = color;
+}
+
+void raycast(t_vars *vars)
+{
+
+    double posX = (hero.pos_x / SQUARE_SIZE) + 0.1;
+    double posY = (hero.pos_y / SQUARE_SIZE) + 0.1;  //x and y start position
+
+
+
+    int x = 0;
+    int y = 0;
+
+    int c_def = 0x08b5ff;
+
+    while (x < map.window_width - 1)
+    {
+        double cameraX = 2 * x / (double)map.window_width - 1; //x-coordinate in camera space
+        double rayDirX = hero.dirX + hero.planeX * cameraX;
+        double rayDirY = hero.dirY + hero.planeY * cameraX;
+        //which box of the map we're in
+        int mapX = (int)posX;
+        int mapY = (int)posY;
+
+//        int mapX = (int)(hero.pos_x / SQUARE_SIZE);
+//        int mapY = (int)(hero.pos_y / SQUARE_SIZE);
+
+
+        //длина луча от текущей позиции до следующей стороны x или y
+        double sideDistX;
+        double sideDistY;
+
+        // длина луча от одной стороны x или y до следующей стороны x или y
+        double deltaDistX = (rayDirY == 0) ? 0 : ((rayDirX == 0) ? 1 : (double)fabs(1 / rayDirX));
+        double deltaDistY = (rayDirX == 0) ? 0 : ((rayDirY == 0) ? 1 : (double)fabs(1 / rayDirY));
+        double perpWallDist;
+
+        // в каком направлении шагать по оси x или y (+1 или -1)
+        int stepX;
+        int stepY;
+
+        int hit = 0;
+        int side; //was a NS or a EW wall hit?
+
+        if(rayDirX < 0)
+        {
+            stepX = -1;
+            sideDistX = (posX - mapX) * deltaDistX;
+        }
+        else
+        {
+            stepX = 1;
+            sideDistX = (mapX + 1.0 - posX) * deltaDistX;
+        }
+        if(rayDirY < 0)
+        {
+            stepY = -1;
+            sideDistY = (posY - mapY) * deltaDistY;
+        }
+        else
+        {
+            stepY = 1;
+            sideDistY = (mapY + 1.0 - posY) * deltaDistY;
+        }
+
+        //perform DDA
+        while (hit == 0)
+        {
+            //jump to next map square, OR in x-direction, OR in y-direction
+            if(sideDistX < sideDistY)
+            {
+                sideDistX += deltaDistX;
+                mapX += stepX;
+                side = 0;
+            }
+            else
+            {
+                sideDistY += deltaDistY;
+                mapY += stepY;
+                side = 1;
+            }
+            //Check if ray has hit a wall
+            if(map.field[mapY][mapX] == '1') hit = 1;
+        }
+
+        //Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
+        if(side == 0) perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
+        else          perpWallDist = (mapY - posY + (1 - stepY) / 2) / rayDirY;
+
+        //Calculate height of line to draw on screen
+        int lineHeight = (int)(map.window_height / perpWallDist);
+
+        //calculate lowest and highest pixel to fill in current stripe
+        int drawStart = -lineHeight / 2 + map.window_height / 2;
+        if (drawStart < 0) drawStart = 0;
+        int drawEnd = lineHeight / 2 + map.window_height / 2;
+        if(drawEnd >= map.window_height)drawEnd = map.window_height - 1;
+
+        c_def = map.field[mapY][mapX] == '1' ? 0x332b2c : c_def;
+
+        //give x and y sides different brightness
+        c_def = (side == 1) ? c_def / 2 : c_def;
+
+        int color_down = 0x005e09;
+
+        y = 0;
+
+        while (y < map.window_height)
+        {
+            int color = 0x40afff;
+            //color = y >= drawStart ? c_def : color;
+            //color = y <= drawEnd ? c_def : color;
+            color = y >= drawStart && y <= drawEnd ? c_def : color;
+            if (y > drawEnd) {
+                color = color_down;
+            }
+            //color = y < drawStart ? 0x40afff : color;
+            my_mlx_pixel_put(&vars->ray, x, y, color);
+            y++;
+        }
+
+        x++;
+
+    }
+
+    mlx_put_image_to_window(vars->mlx, vars->win, vars->ray.img, 0, 0);
+
 }
 
 void render_minimap(t_vars *vars)
@@ -316,8 +454,8 @@ void render_minimap(t_vars *vars)
         ofsX = -19;
         while (ofsX < 20)
         {
-            startY = hero.pos_y + ofsY;
-            startX = hero.pos_x + ofsX;
+            startY = (int)(hero.pos_y / SQUARE_SIZE) + ofsY;
+            startX = (int)(hero.pos_x / SQUARE_SIZE) + ofsX;
 
             if ((startY > map.height - 1)
                 || (startY < 0)
@@ -356,15 +494,45 @@ void render_minimap(t_vars *vars)
 
 int             on_key_press_handler(int keycode, t_vars *vars)
 {
+
+    hero.posX = (hero.pos_x / SQUARE_SIZE) + (1 / SQUARE_SIZE * SQUARE_SIZE / 2);
+    hero.posY = (hero.pos_y / SQUARE_SIZE) + (1 / SQUARE_SIZE * SQUARE_SIZE / 2);
+
+    double moveSpeed = 10;
+
     if (keycode == CODE_KEY_UP) {
-        step_forward(&hero);
+        if(map.field[(int)(hero.posY + hero.dirY / SQUARE_SIZE * moveSpeed)][(int)(hero.posX)] == ' '
+        || map.field[(int)(hero.posY + hero.dirY / SQUARE_SIZE * moveSpeed)][(int)(hero.posX)] == hero.direction)
+            hero.pos_y += (hero.dirY / SQUARE_SIZE)  * moveSpeed;
+        if(map.field[(int)(hero.posY)][(int)(hero.posX + hero.dirX  / SQUARE_SIZE * moveSpeed)] == ' '
+        || map.field[(int)(hero.posY)][(int)(hero.posX + hero.dirX  / SQUARE_SIZE * moveSpeed)] == hero.direction)
+            hero.pos_x += (hero.dirX  / SQUARE_SIZE)  * moveSpeed;
+
+        map.field[(int)(hero.pos_y / SQUARE_SIZE)][(int)(hero.pos_x  / SQUARE_SIZE)] = hero.direction;
+
+        //step_forward(&hero);
     }
+    float rotSpeed = 0.4;
+    double oldDirX = hero.dirX;
+    double oldPlaneX = hero.planeX;
+
     if (keycode == CODE_KEY_RIGHT) {
-        turn_right(&hero);
+        hero.dirX = hero.dirX * cos(-rotSpeed) - hero.dirY * sin(-rotSpeed);
+        hero.dirY = oldDirX * sin(-rotSpeed) + hero.dirY * cos(-rotSpeed);
+
+        hero.planeX = hero.planeX * cos(-rotSpeed) - hero.planeY * sin(-rotSpeed);
+        hero.planeY = oldPlaneX * sin(-rotSpeed) + hero.planeY * cos(-rotSpeed);
+        //turn_right(&hero);
     }
     if (keycode == CODE_KEY_LEFT) {
-        turn_left(&hero);
+        hero.dirX = hero.dirX * cos(rotSpeed) - hero.dirY * sin(rotSpeed);
+        hero.dirY = oldDirX * sin(rotSpeed) + hero.dirY * cos(rotSpeed);
+
+        hero.planeX = hero.planeX * cos(rotSpeed) - hero.planeY * sin(rotSpeed);
+        hero.planeY = oldPlaneX * sin(rotSpeed) + hero.planeY * cos(rotSpeed);
+        //turn_left(&hero);
     }
+    raycast(vars);
     render_minimap(vars);
     if (keycode == CODE_KEY_ESC) {
         mlx_destroy_window(vars->mlx, vars->win);
@@ -372,6 +540,7 @@ int             on_key_press_handler(int keycode, t_vars *vars)
     }
     return (0);
 }
+
 
 
 static void map_render(void)
@@ -387,13 +556,29 @@ static void map_render(void)
     vars.mlx = mlx;
     vars.win = mlx_win;
 
-    vars.minimap.img = mlx_new_image(mlx, 200, 100);
+    vars.minimap.img = mlx_new_image(mlx, 195, 95);
     vars.minimap.addr = mlx_get_data_addr(vars.minimap.img,
                                           &vars.minimap.bits_per_pixel,
                                           &vars.minimap.line_length,
                                           &vars.minimap.endian);
 
+    vars.ray.img = mlx_new_image(mlx, map.window_width, map.window_height);
+    vars.ray.addr = mlx_get_data_addr(vars.ray.img,
+                                          &vars.ray.bits_per_pixel,
+                                          &vars.ray.line_length,
+                                          &vars.ray.endian);
+
+    hero.planeX = 0;
+    hero.planeY = 0.6;
+
+    hero.dirX = hero.vector_x;
+    hero.dirY = hero.vector_y;
+
+
+    raycast(&vars);
     render_minimap(&vars);
+
+
     mlx_key_hook(vars.win, on_key_press_handler, &vars);
 
 
@@ -435,8 +620,9 @@ static int create_map(const char *filename)
                 if (ft_strchr(&ALLOWED_DIRECTIONS[0], line[i])) {
                     if (hero.direction)
                         return (exit_with_error(ERR_HERO_POSITION, 1));
-                    hero.pos_x = i;
-                    hero.pos_y = map.height - 1;
+
+                    hero.pos_x = i * SQUARE_SIZE + SQUARE_SIZE / 2;
+                    hero.pos_y = (map.height - 1) * SQUARE_SIZE + SQUARE_SIZE / 2;
                     set_direction(&hero, line[i]);
                 }
                 i++;
@@ -489,7 +675,7 @@ static int create_map(const char *filename)
     }
     free(line);
 
-    if (!(ch_map(hero.pos_x, hero.pos_y)))
+    if (!(ch_map((int)(hero.pos_x / SQUARE_SIZE), (int)(hero.pos_y / SQUARE_SIZE))))
         return (exit_with_error("Map is not valid", 1));
 
     map_print(map.field);
