@@ -26,6 +26,16 @@
 
 # define SQUARE_SIZE 32
 
+typedef struct s_btn {
+    int     w;
+    int     s;
+    int     a;
+    int     d;
+
+    int     right;
+    int     left;
+}               t_btn;
+
 typedef struct s_color {
     int     is_init;
     int     red;
@@ -36,6 +46,8 @@ typedef struct s_color {
 typedef struct s_hero {
     int     pos_x_start;
     int     pos_y_start;
+
+    double angle;
 
     int     pos_x;
     int     pos_y;
@@ -69,6 +81,8 @@ typedef struct  s_map
 
     t_color     floor_color;
     t_color     cell_color;
+
+    t_btn       btn_pressed;
 
     char        *error;
 }               t_map;

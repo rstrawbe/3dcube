@@ -301,6 +301,10 @@ void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
     *(unsigned int*)dst = color;
 }
 
+uint32_t pack_color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a) {
+    return (a<<24) + (b<<16) + (g<<8) + r;
+}
+
 void raycast(t_vars *vars)
 {
 
@@ -404,7 +408,13 @@ void raycast(t_vars *vars)
 
         int color_down = 0x005e09;
 
+
+
         y = 0;
+
+        //int r = 200;
+        //int b = 18;
+        //color_down = pack_color(8, 110, b, 255);
 
         while (y < map.window_height)
         {
@@ -495,6 +505,8 @@ void render_minimap(t_vars *vars)
 int             on_key_press_handler(int keycode, t_vars *vars)
 {
 
+    mlx_do_sync(vars->mlx);
+
     hero.posX = (hero.pos_x / SQUARE_SIZE) + (1 / SQUARE_SIZE * SQUARE_SIZE / 2);
     hero.posY = (hero.pos_y / SQUARE_SIZE) + (1 / SQUARE_SIZE * SQUARE_SIZE / 2);
 
@@ -512,7 +524,7 @@ int             on_key_press_handler(int keycode, t_vars *vars)
 
         //step_forward(&hero);
     }
-    float rotSpeed = 0.4;
+    float rotSpeed = 0.07;
     double oldDirX = hero.dirX;
     double oldPlaneX = hero.planeX;
 
@@ -541,6 +553,10 @@ int             on_key_press_handler(int keycode, t_vars *vars)
     return (0);
 }
 
+void on_key_up_handler()
+{
+    //map.btn_pressed
+}
 
 
 static void map_render(void)
@@ -579,7 +595,10 @@ static void map_render(void)
     render_minimap(&vars);
 
 
-    mlx_key_hook(vars.win, on_key_press_handler, &vars);
+    //mlx_key_hook(vars.win, on_key_press_handler, &vars);
+
+    mlx_hook(vars.win, 2,1L << 0, on_key_press_handler,  &vars);
+
 
 
     mlx_loop(mlx);
@@ -665,11 +684,11 @@ static int create_map(const char *filename)
     i = 0;
     if ((fd = open(filename, O_RDONLY)) == -1)
         return (0);
-    while (get_next_line(fd, &line) > 0 && strnum--)
-        free(line);
+//    while (get_next_line(fd, &line) > 0)
+//        free(line);
     while (get_next_line(fd, &line) > 0)
     {
-        if ((str_len = ft_strlen(line)))
+        if (strnum-- < 0 && ft_strlen(line))
             append_map_line(line, i++);
         free(line);
     }

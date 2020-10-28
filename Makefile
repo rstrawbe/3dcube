@@ -17,7 +17,8 @@ NAME			= cub3D
 all:			$(NAME)
 
 $(NAME):		$(MLX) $(LFT) $(OBJS)
-				gcc ${CFLAGS} -o ${NAME} ${OBJS} ${LIBS}
+				gcc  -o ${NAME} ${OBJS} ${LIBS}
+				#${CFLAGS}
 
 $(MLX):
 				@$(MAKE) -C minilibx
