@@ -56,105 +56,31 @@ static void append_map_line(char *line, int i)
     }
 }
 
-//static void step_forward(t_hero *h)
-//{
-//    int new_x;
-//    int new_y;
-//
-//    new_x = (int)(h->pos_x / SQUARE_SIZE + h->vector_x);
-//    new_y = (int)(h->pos_y / SQUARE_SIZE + h->vector_y);
-//
-//
-//    if (map.field[new_y][new_x] == ' '
-//        || map.field[new_y][new_x] == hero.direction) {
-//
-//        map.field[(int)(h->pos_y / SQUARE_SIZE)][(int)(h->pos_x / SQUARE_SIZE)] = ' ';
-//
-//        h->pos_x += h->vector_x * 10;
-//        h->pos_y += h->vector_y * 10;
-//
-//        new_x = (int)(h->pos_x / SQUARE_SIZE);
-//        new_y = (int)(h->pos_y / SQUARE_SIZE);
-//
-//        map.field[new_y][new_x] = hero.direction;
-//    }
-//}
-
-
-//static void turn_right(t_hero *h)
-//{
-//    if (h->direction == 'N')
-//    {
-//        h->vector_x = 1;
-//        h->vector_y = 0;
-//        h->direction = 'E';
-//    } else if (h->direction == 'W')
-//    {
-//        h->vector_x = 0;
-//        h->vector_y = -1;
-//        h->direction = 'N';
-//    } else if (h->direction == 'S')
-//    {
-//        h->vector_x = -1;
-//        h->vector_y = 0;
-//        h->direction = 'W';
-//    } else if (h->direction == 'E')
-//    {
-//        h->vector_x = 0;
-//        h->vector_y = 1;
-//        h->direction = 'S';
-//    }
-//
-//}
-
-//static void turn_left(t_hero *h)
-//{
-//    if (h->direction == 'N')
-//    {
-//        h->vector_x = -1;
-//        h->vector_y = 0;
-//        h->direction = 'W';
-//    } else if (h->direction == 'W')
-//    {
-//        h->vector_x = 0;
-//        h->vector_y = 1;
-//        h->direction = 'S';
-//    } else if (h->direction == 'S')
-//    {
-//        h->vector_x = 1;
-//        h->vector_y = 0;
-//        h->direction = 'E';
-//    } else if (h->direction == 'E')
-//    {
-//        h->vector_x = 0;
-//        h->vector_y = -1;
-//        h->direction = 'N';
-//    }
-//
-//}
-
-
 static void set_direction(t_hero *h, char c)
 {
     if (c == 'N')
     {
         h->vector_x = 0;
         h->vector_y = -1;
+        hero.angle = 90;
     }
     if (c == 'W')
     {
         h->vector_x = -1;
         h->vector_y = 0;
+        hero.angle = 180;
     }
     if (c == 'S')
     {
         h->vector_x = 0;
         h->vector_y = 1;
+        hero.angle = 270;
     }
     if (c == 'E')
     {
         h->vector_x = 1;
         h->vector_y = 0;
+        hero.angle = 0;
     }
     h->direction = c;
 }
@@ -497,6 +423,8 @@ void render_minimap(t_vars *vars)
         ofsY++;
     }
 
+    my_mlx_pixel_put(&vars->minimap, 97, 47, 0xc8fc38);
+
     if (vars) {}
 
     mlx_put_image_to_window(vars->mlx, vars->win, vars->minimap.img, 0, 0);
@@ -504,53 +432,44 @@ void render_minimap(t_vars *vars)
 
 int             on_key_press_handler(int keycode, t_vars *vars)
 {
+    int hero_speed = 1;
+    double rot_speed = 0.02;
 
-    mlx_do_sync(vars->mlx);
+    double sin_a = sin(hero.angle);
+    double cos_a = cos(hero.angle);
 
-    hero.posX = (hero.pos_x / SQUARE_SIZE) + (1 / SQUARE_SIZE * SQUARE_SIZE / 2);
-    hero.posY = (hero.pos_y / SQUARE_SIZE) + (1 / SQUARE_SIZE * SQUARE_SIZE / 2);
-
-    double moveSpeed = 10;
-
-    if (keycode == CODE_KEY_UP) {
-        if(map.field[(int)(hero.posY + hero.dirY / SQUARE_SIZE * moveSpeed)][(int)(hero.posX)] == ' '
-        || map.field[(int)(hero.posY + hero.dirY / SQUARE_SIZE * moveSpeed)][(int)(hero.posX)] == hero.direction)
-            hero.pos_y += (hero.dirY / SQUARE_SIZE)  * moveSpeed;
-        if(map.field[(int)(hero.posY)][(int)(hero.posX + hero.dirX  / SQUARE_SIZE * moveSpeed)] == ' '
-        || map.field[(int)(hero.posY)][(int)(hero.posX + hero.dirX  / SQUARE_SIZE * moveSpeed)] == hero.direction)
-            hero.pos_x += (hero.dirX  / SQUARE_SIZE)  * moveSpeed;
-
-        map.field[(int)(hero.pos_y / SQUARE_SIZE)][(int)(hero.pos_x  / SQUARE_SIZE)] = hero.direction;
-
-        //step_forward(&hero);
+    if (keycode == CODE_KEY_W) {
+        hero.pos_x += hero_speed * cos_a;
+        hero.pos_y += hero_speed * sin_a;
     }
-    float rotSpeed = 0.07;
-    double oldDirX = hero.dirX;
-    double oldPlaneX = hero.planeX;
-
-    if (keycode == CODE_KEY_RIGHT) {
-        hero.dirX = hero.dirX * cos(-rotSpeed) - hero.dirY * sin(-rotSpeed);
-        hero.dirY = oldDirX * sin(-rotSpeed) + hero.dirY * cos(-rotSpeed);
-
-        hero.planeX = hero.planeX * cos(-rotSpeed) - hero.planeY * sin(-rotSpeed);
-        hero.planeY = oldPlaneX * sin(-rotSpeed) + hero.planeY * cos(-rotSpeed);
-        //turn_right(&hero);
+    if (keycode == CODE_KEY_S) {
+        hero.pos_x -= hero_speed * cos_a;
+        hero.pos_y -= hero_speed * sin_a;
     }
-    if (keycode == CODE_KEY_LEFT) {
-        hero.dirX = hero.dirX * cos(rotSpeed) - hero.dirY * sin(rotSpeed);
-        hero.dirY = oldDirX * sin(rotSpeed) + hero.dirY * cos(rotSpeed);
-
-        hero.planeX = hero.planeX * cos(rotSpeed) - hero.planeY * sin(rotSpeed);
-        hero.planeY = oldPlaneX * sin(rotSpeed) + hero.planeY * cos(rotSpeed);
-        //turn_left(&hero);
+    if (keycode == CODE_KEY_A) {
+        hero.pos_x += hero_speed * sin_a;
+        hero.pos_y += -hero_speed * cos_a;
     }
-    raycast(vars);
-    render_minimap(vars);
+
+    if (keycode == CODE_KEY_D) {
+        hero.pos_x += -hero_speed * sin_a;
+        hero.pos_y += hero_speed * cos_a;
+    }
+    if (keycode == CODE_KEY_RIGHT)
+        hero.angle += rot_speed;
+    if (keycode == CODE_KEY_LEFT)
+        hero.angle -= rot_speed;
+
     if (keycode == CODE_KEY_ESC) {
         mlx_destroy_window(vars->mlx, vars->win);
         exit(0);
     }
-    return (0);
+
+    printf("%f\n", hero.angle);
+
+    if (vars) {
+    }
+    return 1;
 }
 
 void on_key_up_handler()
@@ -697,7 +616,10 @@ static int create_map(const char *filename)
     if (!(ch_map((int)(hero.pos_x / SQUARE_SIZE), (int)(hero.pos_y / SQUARE_SIZE))))
         return (exit_with_error("Map is not valid", 1));
 
-    map_print(map.field);
+    map.full_w = map.width * SQUARE_SIZE;
+    map.full_h = map.height * SQUARE_SIZE;
+
+   // map_print(map.field);
 
     map_render();
 

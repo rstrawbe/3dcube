@@ -5,7 +5,8 @@ MAKE = make
 
 CC				= gcc
 RM				= rm -f
-CFLAGS			= -Wall -Wextra -Werror -I.
+#CFLAGS			= -Wall -Wextra -Werror -I.
+CFLAGS			= ''
 
 LIBS = -L . -lmlx -lft -framework OpenGL -framework AppKit -lm
 
@@ -17,8 +18,7 @@ NAME			= cub3D
 all:			$(NAME)
 
 $(NAME):		$(MLX) $(LFT) $(OBJS)
-				gcc  -o ${NAME} ${OBJS} ${LIBS}
-				#${CFLAGS}
+				gcc ${CFLAGS} -o ${NAME} ${OBJS} ${LIBS}
 
 $(MLX):
 				@$(MAKE) -C minilibx
