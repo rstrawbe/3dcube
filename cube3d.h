@@ -19,12 +19,23 @@
 # define ERR_PARSE_CONFIG_LINE "Incorrect config line"
 
 # define CODE_KEY_ESC 53
+# define CODE_KEY_W 13
+# define CODE_KEY_A 0
+# define CODE_KEY_S 1
+# define CODE_KEY_D 2
 # define CODE_KEY_LEFT 123
 # define CODE_KEY_RIGHT 124
-# define CODE_KEY_DOWN 125
-# define CODE_KEY_UP 126
 
 # define SQUARE_SIZE 32
+
+# define FOV 1.0471975512
+# define HALF_FOV HFOV/2
+# define NUM_RAYS 120
+# define MAX_DEPTH 800
+# define DELTA_ANGLE FOV/NUM_RAYS
+# define DIST NUM_RAYS/ 1.15470053836
+# define PROJECT_COEFF DIST * SQUARE_SIZE
+
 
 typedef struct s_btn {
     int     w;
@@ -78,6 +89,9 @@ typedef struct  s_map
     int         height;
     char        vector_start;
     char        **field;
+
+    int         full_w;
+    int         full_h;
 
     t_color     floor_color;
     t_color     cell_color;
