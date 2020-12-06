@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   set_direction.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rstrawbe <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,13 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cube3d.h"
+#include "../../cube3d.h"
 
-int	main(int argc, char **argv)
+void	set_direction(char c)
 {
-	if (argc < 2)
-		return (exit_with_error(ERR_ARG, 1));
-	if (!check_file_ext(argv[1], "cub"))
-		return (exit_with_error(ERR_MAP_EXT, 1));
-	return (create_map(argv[1]));
+	hero.angle = (c == 'N') ? 3 * M_PI / 2 : 0;
+	hero.angle = (c == 'W') ? M_PI : hero.angle;
+	hero.angle = (c == 'S') ? M_PI / 2 : hero.angle;
+	hero.angle = (c == 'E') ? 0 : hero.angle;
+	hero.direction = c;
 }

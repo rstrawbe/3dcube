@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   create_map.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rstrawbe <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,13 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cube3d.h"
+#include "../../cube3d.h"
 
-int	main(int argc, char **argv)
+int	create_map(const char *filename)
 {
-	if (argc < 2)
-		return (exit_with_error(ERR_ARG, 1));
-	if (!check_file_ext(argv[1], "cub"))
-		return (exit_with_error(ERR_MAP_EXT, 1));
-	return (create_map(argv[1]));
+	int		str_len;
+	int		error;
+
+	game.strnum = 0;
+	game.map_file = (char *)filename;
+	if ((error = read_line(&str_len)))
+		return (error);
+	if (!(ch_map((int)(hero.pos_x / SQUARE_SIZE), \
+		(int)(hero.pos_y / SQUARE_SIZE))))
+	{
+		return (exit_with_error("Map is not valid", 1));
+	}
+	init_game();
+	return (0);
 }

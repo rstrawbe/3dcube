@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   clear.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rstrawbe <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,13 +10,28 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cube3d.h"
+#include "../../cube3d.h"
 
-int	main(int argc, char **argv)
+static void	line(int y, int color)
 {
-	if (argc < 2)
-		return (exit_with_error(ERR_ARG, 1));
-	if (!check_file_ext(argv[1], "cub"))
-		return (exit_with_error(ERR_MAP_EXT, 1));
-	return (create_map(argv[1]));
+	int	j;
+
+	j = 0;
+	while (j < game.window_width)
+		my_mlx_pixel_put(&vars.ray, j++, y, color);
+}
+
+void		clear(void)
+{
+	int	color;
+	int	i;
+
+	i = 0;
+	while (i < game.window_height)
+	{
+		color = i < game.window_height / 2 ? \
+				game.cell_color.color : game.floor_color.color;
+		line(i, color);
+		i++;
+	}
 }

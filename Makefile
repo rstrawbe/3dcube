@@ -1,12 +1,30 @@
-SRCS = main.c get_next_line/get_next_line.c get_next_line/get_next_line_utils.c
+SRCS = get_next_line/get_next_line.c get_next_line/get_next_line_utils.c \
+    components/map_validator/parse_config_str.c \
+    components/map_validator/read_line.c \
+    components/map_validator/error_config.c \
+    components/map_validator/create_map.c \
+    components/map_validator/ch_map.c \
+    components/map_validator/config_is_init.c \
+    components/engine/raycast.c \
+    components/engine/set_direction.c \
+    components/engine/clear.c \
+    components/engine/exit_with_error.c \
+    components/engine/init_game.c \
+    components/engine/movement.c \
+    components/engine/create_rgb.c \
+    components/engine/events_key.c \
+    components/engine/utils.c \
+    components/engine/check_file_ext.c \
+    components/engine/append_map_line.c \
+    main.c
 OBJS = $(SRCS:.c=.o)
 
 MAKE = make
 
 CC				= gcc
 RM				= rm -f
-#CFLAGS			= -Wall -Wextra -Werror -I.
-CFLAGS			= ''
+CFLAGS			= -Wall -Wextra -Werror -I.
+#CFLAGS			= ''
 
 LIBS = -L . -lmlx -lft -framework OpenGL -framework AppKit -lm
 
