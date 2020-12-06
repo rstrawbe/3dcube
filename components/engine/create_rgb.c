@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   create_rgb.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rstrawbe <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,13 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cube3d.h"
+#include "../../cube3d.h"
 
-int	main(int argc, char **argv)
+int		create_rgb(int r, int g, int b)
 {
-	if (argc < 2)
-		return (exit_with_error(ERR_ARG, 1));
-	if (!check_file_ext(argv[1], "cub"))
-		return (exit_with_error(ERR_MAP_EXT, 1));
-	return (create_map(argv[1]));
+	int	t;
+
+	t = 0;
+	return (t << 24 | r << 16 | g << 8 | b);
 }

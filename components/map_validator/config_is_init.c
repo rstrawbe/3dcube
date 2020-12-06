@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   config_is_init.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rstrawbe <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,13 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cube3d.h"
+#include "../../cube3d.h"
 
-int	main(int argc, char **argv)
+int	config_is_init(void)
 {
-	if (argc < 2)
-		return (exit_with_error(ERR_ARG, 1));
-	if (!check_file_ext(argv[1], "cub"))
-		return (exit_with_error(ERR_MAP_EXT, 1));
-	return (create_map(argv[1]));
+	return (game.window_height && game.window_width \
+			&& game.north_texture && game.south_texture \
+			&& game.west_texture && game.east_texture && game.sprite_path \
+			&& game.floor_color.is_init && game.cell_color.is_init);
 }

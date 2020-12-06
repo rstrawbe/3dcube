@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   exit_with_error.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rstrawbe <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,13 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cube3d.h"
+#include "../../cube3d.h"
 
-int	main(int argc, char **argv)
+int	exit_with_error(char *str, int code)
 {
-	if (argc < 2)
-		return (exit_with_error(ERR_ARG, 1));
-	if (!check_file_ext(argv[1], "cub"))
-		return (exit_with_error(ERR_MAP_EXT, 1));
-	return (create_map(argv[1]));
+	ft_putstr_fd("Error\n", STDERR);
+	ft_putstr_fd(str, STDERR);
+	ft_putstr_fd("\n", STDERR);
+	return (code);
 }
