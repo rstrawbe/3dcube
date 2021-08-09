@@ -23,8 +23,7 @@ MAKE = make
 
 CC				= gcc
 RM				= rm -f
-#CFLAGS			= -Wall -Wextra -Werror -I.
-CFLAGS			= 
+CFLAGS				= -Wall -Wextra -Werror -I.
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -48,8 +47,6 @@ $(NAME):		$(MLX) $(LFT) $(OBJS)
 
 $(MLX):
 				@$(MAKE) -C $(MLX_DIR)
-#				@$(MAKE) -C minilibx
-#				@mv minilibx/$(MLX) .
 				@mv $(MLX_DIR)/$(MLX) .
 
 $(LFT):
