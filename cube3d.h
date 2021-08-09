@@ -55,8 +55,8 @@
 
 # define SQUARE_SIZE 75
 
-# define HERO_SPEED 10
-# define HERO_ROT_SPEED 0.05
+# define HERO_SPEED 6
+# define HERO_ROT_SPEED 0.02
 # define HERO_BODY SQUARE_SIZE * 0.8
 # define FOV M_PI/3
 # define HALF_FOV FOV/2
