@@ -33,6 +33,7 @@ static int	set_win_params(char **arr)
 	int		screen_w;
 	int		screen_h;
 
+	vars.mlx = mlx_init();
 	mlx_get_screen_size(vars.mlx, &screen_w, &screen_h);
 	game.window_width = ft_atoi(&arr[1][0]);
 	game.window_height = ft_atoi(&arr[2][0]);

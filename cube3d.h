@@ -44,6 +44,14 @@
 # define CODE_KEY_LEFT 123
 # define CODE_KEY_RIGHT 124
 
+# define CODE_KEY_ESC_LIN 65307
+# define CODE_KEY_W_LIN 119
+# define CODE_KEY_A_LIN 97
+# define CODE_KEY_S_LIN 115
+# define CODE_KEY_D_LIN 100
+# define CODE_KEY_LEFT_LIN 65361
+# define CODE_KEY_RIGHT_LIN 65363
+
 # define SQUARE_SIZE 75
 
 # define HERO_SPEED 10

@@ -23,13 +23,21 @@ MAKE = make
 
 CC				= gcc
 RM				= rm -f
-CFLAGS			= -Wall -Wextra -Werror -I.
-#CFLAGS			= ''
+#CFLAGS			= -Wall -Wextra -Werror -I.
+CFLAGS			= 
 
-LIBS = -L . -lmlx -lft -framework OpenGL -framework AppKit -lm
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	LIBS		= -L . -lmlx -lft -lXext -lX11 -lm -lz
+	MLX		= libmlx.a
+	MLX_DIR		= minilibx-linux
+else
+	LIBS		= -L . -lmlx -lft -framework OpenGL -framework AppKit -lm
+	MLX		= libmlx.dylib
+	MLX_DIR		= minilibx-linux
+endif
 
-LFT             = libft.a
-MLX				= libmlx.dylib
+LFT			= libft.a
 
 NAME			= cub3D
 
@@ -39,15 +47,17 @@ $(NAME):		$(MLX) $(LFT) $(OBJS)
 				gcc ${CFLAGS} -o ${NAME} ${OBJS} ${LIBS}
 
 $(MLX):
-				@$(MAKE) -C minilibx
-				@mv minilibx/$(MLX) .
+				@$(MAKE) -C $(MLX_DIR)
+#				@$(MAKE) -C minilibx
+#				@mv minilibx/$(MLX) .
+				@mv $(MLX_DIR)/$(MLX) .
 
 $(LFT):
 				@$(MAKE) -C libft
 				@mv libft/$(LFT) .
 
 clean:
-				@$(MAKE) -C minilibx clean
+				@$(MAKE) -C $(MLX_DIR) clean
 				@$(MAKE) -C libft clean
 				$(RM) $(OBJS) $(BONUS_OBJS)
 
