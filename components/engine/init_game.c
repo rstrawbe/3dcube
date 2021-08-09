@@ -53,7 +53,7 @@ static void	create_ray_img(void)
 void		init_game(void)
 {
 	vars.win = mlx_new_window(vars.mlx, game.window_width, \
-						game.window_height, "isTitle");
+						game.window_height, GAME_TITLE);
 	ray.delta_angle = FOV / game.window_width;
 	ray.dist = game.window_width / (2 * tan(HALF_FOV));
 	ray.pr_coef = ray.dist * SQUARE_SIZE;

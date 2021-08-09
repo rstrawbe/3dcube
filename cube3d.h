@@ -21,6 +21,7 @@
 
 # include <errno.h>
 
+# define GAME_TITLE "CUBE 3D"
 # define ALLOWED_MAP_CHARS " 012NSEW"
 # define ALLOWED_DIRECTIONS "NSEW"
 # define EXT_LENGTH 5
