@@ -21,9 +21,10 @@ static int	set_color(t_color *color, char **arr)
 	arr_count = ft_array_count(rgb);
 	if (arr_count != 3)
 		exit_with_error("Incorrect color", 100);
-	color->color = create_rgb(ft_atoi(rgb[0]), \
-	ft_atoi(rgb[1]), \
-	ft_atoi(rgb[2]));
+	color->red = ft_atoi(rgb[0]);
+	color->green = ft_atoi(rgb[1]);
+	color->blue = ft_atoi(rgb[2]);
+	color->color = create_rgb(color->red, color->green, color->blue);
 	color->is_init = 1;
 	return (1);
 }
@@ -37,6 +38,7 @@ static int	set_win_params(char **arr)
 	mlx_get_screen_size(vars.mlx, &screen_w, &screen_h);
 	game.window_width = ft_atoi(&arr[1][0]);
 	game.window_height = ft_atoi(&arr[2][0]);
+	game.window_half_height = game.window_height / 2;
 	if (game.window_width <= 300 \
 		|| game.window_width > screen_w)
 		game.window_width = screen_w;

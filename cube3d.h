@@ -61,6 +61,12 @@
 # define FOV M_PI/3
 # define HALF_FOV FOV/2
 
+# define MINIMAP_WIDTH 150
+# define MINIMAP_HEIGHT 75
+# define MINIMAP_BG_COLOR 0xbaa9a9
+# define MINIMAP_WALL_COLOR 0x5c5353
+# define MINIMAP_HERO_COLOR 0x2e2a2a
+
 typedef struct	s_data {
 	void		*img;
 	char		*addr;
@@ -122,6 +128,7 @@ typedef struct	s_game
 	char		*sprite_path;
 	int			window_width;
 	int			window_height;
+	int			window_half_height;
 	int			width;
 	int			height;
 	char		**field;
@@ -173,6 +180,7 @@ struct s_vars	vars;
 struct s_ray	ray;
 
 int				create_rgb(int r, int g, int b);
+int				get_dark_color(int color, double ratio);
 int				get_cell(double os);
 char			get_value_map(int y, int x);
 int				init_map_validator();
@@ -184,7 +192,7 @@ void			init_game(void);
 int				error_config(void);
 int				read_line(int *str_len);
 int				create_map(const char *filename);
-void			render_minimap(t_vars *vars);
+void			render_minimap(void);
 void			clear(void);
 void			my_mlx_pixel_put(t_data *data, int x, int y, int color);
 int				my_mlx_get_color(t_data *data, int x, int y);

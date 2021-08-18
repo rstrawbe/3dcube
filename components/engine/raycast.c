@@ -12,6 +12,9 @@
 
 #include "../../cube3d.h"
 
+void			render_minimap()
+{}
+
 static void	change_texture(void)
 {
 	if (ray.depth_v < ray.depth_h && ray.dir_x < 0)
@@ -110,6 +113,7 @@ int			raycast(void)
 	ray.yo = hero.pos_y;
 	ray.xm = (int)hero.pos_x / SQUARE_SIZE * SQUARE_SIZE;
 	ray.ym = (int)hero.pos_y / SQUARE_SIZE * SQUARE_SIZE;
+
 	while (ray.num_rays < game.window_width)
 	{
 		horizontls();
@@ -117,6 +121,10 @@ int			raycast(void)
 		{
 			ray.color = my_mlx_get_color(ray.wall_img, \
 				ray.offset * ray.texture_scale, ray.texture_h * ray.v_coef);
+			if (ray.depth > 10)
+			{
+				ray.color = get_dark_color(ray.color, ray.depth * 0.0001);
+			}
 			my_mlx_pixel_put(&vars.ray, ray.num_rays, ray.y_start, ray.color);
 			ray.texture_h++;
 			ray.y_start++;
@@ -125,5 +133,6 @@ int			raycast(void)
 		ray.num_rays++;
 	}
 	mlx_put_image_to_window(vars.mlx, vars.win, vars.ray.img, 0, 0);
+
 	return (0);
 }

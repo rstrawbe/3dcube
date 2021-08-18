@@ -50,6 +50,15 @@ static void	create_ray_img(void)
 					&vars.ray.endian);
 }
 
+static	void	create_minimap(void)
+{
+	vars.minimap.img = mlx_new_image(vars.mlx, MINIMAP_WIDTH, MINIMAP_HEIGHT);
+	vars.minimap.addr = mlx_get_data_addr(vars.minimap.img, \
+					&vars.minimap.bits_per_pixel, \
+					&vars.minimap.line_length, \
+					&vars.minimap.endian);
+}
+
 void		init_game(void)
 {
 	vars.win = mlx_new_window(vars.mlx, game.window_width, \
@@ -59,6 +68,7 @@ void		init_game(void)
 	ray.pr_coef = ray.dist * SQUARE_SIZE;
 	ray.half_height = game.window_height / 2;
 	create_ray_img();
+	create_minimap();
 	set_images();
 	init_buttons();
 	mlx_hook(vars.win, 2, 1L << 0, on_key_press_handler, NULL);
