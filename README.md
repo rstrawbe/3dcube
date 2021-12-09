@@ -2,9 +2,11 @@
 
 # 3dcube
 
-### Linux Depends
-sudo apt-get update && sudo apt-get install xorg libxext-dev zlib1g-dev
+## Installation
+* Linux Depends: 
+`$ sudo apt-get update && sudo apt-get install -y xorg libxext-dev zlib1g-dev libbsd-dev`
+* Submodules: 
+`$ git submodule update --init`
 
-sudo apt-get install -y libbsd-dev
-
-
+## Run
+`$ ./cub3D maps/map.cub`
