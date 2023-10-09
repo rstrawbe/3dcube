@@ -33,7 +33,7 @@ ifeq ($(UNAME_S),Linux)
 else
 	LIBS		= -L . -lmlx -lft -framework OpenGL -framework AppKit -lm
 	MLX		= libmlx.dylib
-	MLX_DIR		= minilibx-linux
+	MLX_DIR		= minilibx
 endif
 
 LFT			= libft.a
